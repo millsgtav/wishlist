@@ -1,0 +1,11 @@
+[
+  {
+    "guid": "611ce32a-d57d-4573-a7ec-bf4748b708f9",
+    "name": "Wishlist",
+    "description": "A shopping wishlist for movies and TV shows, with TMDb search.",
+    "overview": "Keep a list of movies and TV shows to buy on your next shopping trip.",
+    "owner": "Repository owner",
+    "category": "General",
+    "versions": []
+  }
+]

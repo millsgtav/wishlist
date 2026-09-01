@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<div id="wishlistPluginPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="wishlistSettingsForm">
+                <div class="inputContainer">
+                    <input id="tmdbApiKey" type="password" is="emby-input" label="TMDb API key" autocomplete="off" />
+                    <div class="fieldDescription">Used only to search TMDb from this Jellyfin server.</div>
+                </div>
+                <button is="emby-button" type="submit" class="raised button-submit block">Save settings</button>
+            </form>
+
+            <form id="wishlistSearchForm">
+                <div class="inputContainer">
+                    <input id="wishlistSearch" is="emby-input" label="Find a movie or TV show" />
+                </div>
+                <button is="emby-button" type="submit" class="raised block">Search TMDb</button>
+            </form>
+
+            <div id="wishlistSearchResults"></div>
+            <h2>Shopping list</h2>
+            <div id="wishlistItems"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
+        var page = document.querySelector('#wishlistPluginPage');
+
+        function request(method, path, data) {
+            return ApiClient.ajax({
+                type: method,
+                url: ApiClient.getUrl(path),
+                data: data ? JSON.stringify(data) : undefined,
+                contentType: 'application/json'
+            });
+        }
+
+        function text(value) {
+            return document.createTextNode(value || '');
+        }
+
+        function makeResult(item, target, canAdd) {
+            var row = document.createElement('div');
+            row.className = 'listItem';
+            if (item.PosterUrl) {
+                var image = document.createElement('img');
+                image.src = item.PosterUrl;
+                image.alt = '';
+                image.style.cssText = 'width:52px;height:78px;object-fit:cover;margin-right:1em';
+                row.appendChild(image);
+            }
+            var details = document.createElement('div');
+            details.className = 'listItemBody';
+            var title = document.createElement('div');
+            title.className = 'listItemBodyText';
+            title.appendChild(text(item.Title + (item.Year ? ' (' + item.Year + ')' : '')));
+            details.appendChild(title);
+            var type = document.createElement('div');
+            type.className = 'fieldDescription';
+            type.appendChild(text(item.MediaType === 'tv' ? 'TV show' : 'Movie'));
+            details.appendChild(type);
+            row.appendChild(details);
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'raised emby-button';
+            button.appendChild(text(canAdd ? 'Add' : 'Remove'));
+            button.addEventListener('click', function () {
+                if (canAdd) {
+                    request('POST', 'Wishlist', item).then(function () { loadItems(); target.innerHTML = ''; });
+                } else {
+                    request('DELETE', 'Wishlist/' + item.Id).then(loadItems);
+                }
+            });
+            row.appendChild(button);
+            target.appendChild(row);
+        }
+
+        function loadItems() {
+            var target = page.querySelector('#wishlistItems');
+            target.innerHTML = '';
+            request('GET', 'Wishlist').then(function (items) {
+                if (!items.length) {
+                    target.appendChild(text('Your shopping list is empty.'));
+                    return;
+                }
+                items.forEach(function (item) { makeResult(item, target, false); });
+            });
+        }
+
+        page.querySelector('#wishlistSettingsForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                config.TmdbApiKey = page.querySelector('#tmdbApiKey').value;
+                return ApiClient.updatePluginConfiguration(pluginId, config);
+            }).then(function () { Dashboard.alert('Wishlist settings saved.'); });
+        });
+
+        page.querySelector('#wishlistSearchForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var target = page.querySelector('#wishlistSearchResults');
+            target.innerHTML = '';
+            request('GET', 'Wishlist/search?query=' + encodeURIComponent(page.querySelector('#wishlistSearch').value))
+                .then(function (items) { items.forEach(function (item) { makeResult(item, target, true); }); })
+                .catch(function () { Dashboard.alert('TMDb search failed. Save a valid API key, then try again.'); });
+        });
+
+        page.addEventListener('viewshow', function () {
+            ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                page.querySelector('#tmdbApiKey').value = config.TmdbApiKey || '';
+            });
+            loadItems();
+        });
+    }());
+</script>

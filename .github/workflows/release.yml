@@ -1,0 +1,52 @@
+name: Release Jellyfin plugin
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build plugin archive
+        shell: pwsh
+        run: ./build-plugin.ps1 -Version $env:GITHUB_REF_NAME.Substring(1)
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+          tag_name: ${{ github.ref_name }}
+          target_commitish: ${{ github.event.repository.default_branch }}
+      - name: Update installation manifest
+        shell: pwsh
+        env:
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.Substring(1)
+          $zip = Get-ChildItem artifacts -Filter '*.zip' | Select-Object -First 1
+          $manifest = Get-Content manifest.json -Raw | ConvertFrom-Json
+          $manifest[0].owner = $env:REPOSITORY.Split('/')[0]
+          $manifest[0].versions = @(@{
+            version = $version
+            changelog = "Release $version"
+            targetAbi = '10.10.0.0'
+            sourceUrl = "https://github.com/$env:REPOSITORY/releases/download/v$version/$($zip.Name)"
+            checksum = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+            timestamp = (Get-Date).ToUniversalTime().ToString('o')
+          })
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content manifest.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add manifest.json
+          git commit -m "Update plugin manifest for $env:VERSION"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
