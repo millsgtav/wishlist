@@ -26,6 +26,9 @@ public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             {
                 Name = "wishlist",
                 EmbeddedResourcePath = "Jellyfin.Plugin.Wishlist.Configuration.configPage.html",
+                DisplayName = "Wishlist",
+                EnableInMainMenu = true,
+                MenuIcon = "shopping_cart",
             },
         ];
     }
