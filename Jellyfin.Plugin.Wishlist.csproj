@@ -4,6 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <!-- Single source of truth for the plugin version; bump this before tagging a release -->
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

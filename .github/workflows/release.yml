@@ -17,6 +17,15 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+      - name: Verify tag matches csproj version
+        shell: pwsh
+        run: |
+          $tagVersion = $env:GITHUB_REF_NAME.Substring(1)
+          $csprojVersion = ([xml](Get-Content Jellyfin.Plugin.Wishlist.csproj -Raw)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if ($tagVersion -ne $csprojVersion) {
+            Write-Error "Tag v$tagVersion does not match <Version>$csprojVersion</Version> in Jellyfin.Plugin.Wishlist.csproj. Update the csproj, commit, then re-tag."
+            exit 1
+          }
       - name: Build plugin archive
         shell: pwsh
         run: ./build-plugin.ps1 -Version $env:GITHUB_REF_NAME.Substring(1)
@@ -48,5 +57,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add manifest.json
-          git commit -m "Update plugin manifest for $env:VERSION"
+          git commit -m "Update plugin manifest for $version"
           git push origin HEAD:${{ github.event.repository.default_branch }}
