@@ -1,11 +1,18 @@
-[
-  {
-    "guid": "611ce32a-d57d-4573-a7ec-bf4748b708f9",
-    "name": "Wishlist",
-    "description": "A shopping wishlist for movies and TV shows, with TMDb search.",
-    "overview": "Keep a list of movies and TV shows to buy on your next shopping trip.",
-    "owner": "Repository owner",
-    "category": "General",
-    "versions": []
-  }
-]
+{
+  "guid": "611ce32a-d57d-4573-a7ec-bf4748b708f9",
+  "name": "Wishlist",
+  "description": "A shopping wishlist for movies and TV shows, with TMDb search.",
+  "overview": "Keep a list of movies and TV shows to buy on your next shopping trip.",
+  "owner": "millsgtav",
+  "category": "General",
+  "versions": [
+    {
+      "sourceUrl": "https://github.com/millsgtav/wishlist/releases/download/v1.0.0/jellyfin-wishlist_1.0.0.zip",
+      "version": "1.0.0",
+      "timestamp": "2026-09-01T23:56:31.8870425Z",
+      "changelog": "Release 1.0.0",
+      "checksum": "dcd6f4a90578586154917a8414c17451863ab1780b4b357fb702739e8a755da2",
+      "targetAbi": "10.10.0.0"
+    }
+  ]
+}
