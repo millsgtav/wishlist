@@ -40,7 +40,8 @@
                 type: method,
                 url: ApiClient.getUrl(path),
                 data: data ? JSON.stringify(data) : undefined,
-                contentType: 'application/json'
+                contentType: 'application/json',
+                dataType: method === 'DELETE' ? undefined : 'json'
             });
         }
 
