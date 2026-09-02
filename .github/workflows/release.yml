@@ -48,7 +48,7 @@ jobs:
           $manifest[0].versions = @(@{
             version = $version
             changelog = "Release $version"
-            targetAbi = '10.10.0.0'
+            targetAbi = '10.11.0.0'
             sourceUrl = "https://github.com/$env:REPOSITORY/releases/download/v$version/$($zip.Name)"
             checksum = (Get-FileHash $zip -Algorithm MD5).Hash.ToLowerInvariant()
             timestamp = (Get-Date).ToUniversalTime().ToString('o')
