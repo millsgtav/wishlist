@@ -78,6 +78,31 @@
                 #wishlistPluginPage .wishlistSearchBar .wishlistInput {
                     flex: 1;
                 }
+                #wishlistPluginPage .wishlistFilters {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.5em;
+                    margin: 0 0 1.2em;
+                }
+                #wishlistPluginPage .wishlistFilterGroup {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.35em;
+                }
+                #wishlistPluginPage .wishlistFilterPill {
+                    border: 1px solid rgba(255, 255, 255, 0.18);
+                    border-radius: 999px;
+                    padding: 0.4em 0.85em;
+                    background: rgba(255, 255, 255, 0.05);
+                    color: inherit;
+                    cursor: pointer;
+                    font-size: 0.85em;
+                }
+                #wishlistPluginPage .wishlistFilterPill:hover,
+                #wishlistPluginPage .wishlistFilterPill.active {
+                    border-color: #00a4dc;
+                    background: rgba(0, 164, 220, 0.2);
+                }
                 #wishlistPluginPage h2 {
                     font-size: 1.15em;
                     margin: 1.6em 0 0.7em;
@@ -187,6 +212,19 @@
                 </div>
             </details>
 
+            <div class="wishlistFilters" aria-label="Shopping list filters">
+                <div class="wishlistFilterGroup" role="group" aria-label="Sort shopping list">
+                    <button type="button" class="wishlistFilterPill active" data-sort="title-asc">A-Z</button>
+                    <button type="button" class="wishlistFilterPill" data-sort="title-desc">Z-A</button>
+                    <button type="button" class="wishlistFilterPill" data-sort="date-added">Date Added</button>
+                </div>
+                <div class="wishlistFilterGroup" role="group" aria-label="Filter by media type">
+                    <button type="button" class="wishlistFilterPill active" data-media-type="all">All</button>
+                    <button type="button" class="wishlistFilterPill" data-media-type="movie">Movies</button>
+                    <button type="button" class="wishlistFilterPill" data-media-type="tv">TV Shows</button>
+                </div>
+            </div>
+
             <form id="wishlistSearchForm" class="wishlistSearchBar">
                 <input id="wishlistSearch" type="text" class="wishlistInput" placeholder="Find a movie or TV show" />
                 <button type="submit" class="wishlistButton">Search</button>
@@ -199,9 +237,12 @@
         </div>
     </div>
 
-    <!--<script>
+    <script>
     (function () {
         var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
+        var wishlistItems = [];
+        var selectedSort = 'title-asc';
+        var selectedMediaType = 'all';
         // Jellyfin's view cache can hold a stale, already-initialized copy of this page; always pick the fresh one.
         var page = document.querySelector('#wishlistPluginPage:not([data-wishlist-ready])') || document.querySelector('#wishlistPluginPage');
         page.setAttribute('data-wishlist-ready', 'true');
@@ -279,16 +320,54 @@
             var target = page.querySelector('#wishlistItems');
             target.innerHTML = '';
             request('GET', 'Wishlist').then(function (items) {
-                if (!items.length) {
+                wishlistItems = items;
+                renderItems();
+            });
+        }
+
+        function renderItems() {
+            var target = page.querySelector('#wishlistItems');
+            var items = wishlistItems.filter(function (item) {
+                return selectedMediaType === 'all' || item.MediaType === selectedMediaType;
+            });
+
+            items.sort(function (left, right) {
+                if (selectedSort === 'date-added') {
+                    return new Date(right.AddedAt) - new Date(left.AddedAt);
+                }
+
+                var comparison = left.Title.localeCompare(right.Title, undefined, { sensitivity: 'base' });
+                return selectedSort === 'title-desc' ? -comparison : comparison;
+            });
+
+            target.innerHTML = '';
+            if (!items.length) {
                     var empty = document.createElement('div');
                     empty.className = 'wishlistEmpty';
-                    empty.appendChild(text('Your shopping list is empty.'));
+                    empty.appendChild(text(wishlistItems.length ? 'No items match these filters.' : 'Your shopping list is empty.'));
                     target.appendChild(empty);
                     return;
                 }
                 items.forEach(function (item) { makeCard(item, target, false); });
-            });
         }
+
+        page.querySelectorAll('[data-sort]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                selectedSort = button.getAttribute('data-sort');
+                page.querySelectorAll('[data-sort]').forEach(function (item) { item.classList.remove('active'); });
+                button.classList.add('active');
+                renderItems();
+            });
+        });
+
+        page.querySelectorAll('[data-media-type]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                selectedMediaType = button.getAttribute('data-media-type');
+                page.querySelectorAll('[data-media-type]').forEach(function (item) { item.classList.remove('active'); });
+                button.classList.add('active');
+                renderItems();
+            });
+        });
 
         page.querySelector('#wishlistSettingsForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -315,5 +394,5 @@
             loadItems();
         });
     }());
-    </script>-->
+    </script>
 </div>
