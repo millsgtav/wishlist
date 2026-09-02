@@ -31,7 +31,7 @@ public sealed class WishlistController : ControllerBase
         lock (ConfigurationLock)
         {
             var items = Plugin.Instance.Configuration.Items
-                .OrderByDescending(item => item.AddedAt)
+                .OrderBy(item => item.Title, StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WishlistItemView
                 {
                     Id = item.Id,

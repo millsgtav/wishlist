@@ -140,6 +140,37 @@
                     opacity: 0.7;
                     padding: 0.5em 0;
                 }
+                @media (max-width: 600px) {
+                    #wishlistPluginPage #wishlistItems {
+                        gap: 0.45em;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistCard {
+                        display: grid;
+                        grid-template-columns: 3.5em minmax(0, 1fr);
+                        min-height: 3.5em;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistCardPoster {
+                        width: 3.5em;
+                        height: 5.25em;
+                        grid-row: 1;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistCardBody {
+                        min-width: 0;
+                        padding: 0.45em 0.6em;
+                        gap: 0.2em;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistBadge {
+                        font-size: 0.65em;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistCardTitle {
+                        font-size: 0.85em;
+                        line-height: 1.15;
+                    }
+                    #wishlistPluginPage #wishlistItems .wishlistButton {
+                        padding: 0.3em 0.7em;
+                        font-size: 0.8em;
+                    }
+                }
             </style>
 
             <details class="wishlistSettings">
