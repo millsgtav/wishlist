@@ -1,7 +1,11 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Entities;
 
 namespace Jellyfin.Plugin.Wishlist.Api;
 
@@ -13,19 +17,54 @@ public sealed class WishlistController : ControllerBase
     private const string TmdbImageBaseUrl = "https://image.tmdb.org/t/p/w342";
     private static readonly object ConfigurationLock = new();
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILibraryManager _libraryManager;
 
-    public WishlistController(IHttpClientFactory httpClientFactory)
+    public WishlistController(IHttpClientFactory httpClientFactory, ILibraryManager libraryManager)
     {
         _httpClientFactory = httpClientFactory;
+        _libraryManager = libraryManager;
     }
 
     [HttpGet]
-    public ActionResult<IReadOnlyList<WishlistItem>> GetItems()
+    public ActionResult<IReadOnlyList<WishlistItemView>> GetItems()
     {
         lock (ConfigurationLock)
         {
-            return Ok(Plugin.Instance.Configuration.Items.OrderByDescending(item => item.AddedAt).ToList());
+            var items = Plugin.Instance.Configuration.Items
+                .OrderByDescending(item => item.AddedAt)
+                .Select(item => new WishlistItemView
+                {
+                    Id = item.Id,
+                    Title = item.Title,
+                    MediaType = item.MediaType,
+                    Year = item.Year,
+                    Overview = item.Overview,
+                    PosterUrl = item.PosterUrl,
+                    TmdbId = item.TmdbId,
+                    AddedAt = item.AddedAt,
+                    InLibrary = ExistsInLibrary(item.TmdbId, item.MediaType),
+                })
+                .ToList();
+
+            return Ok(items);
         }
+    }
+
+    private bool ExistsInLibrary(int? tmdbId, string mediaType)
+    {
+        if (tmdbId is null)
+        {
+            return false;
+        }
+
+        var query = new InternalItemsQuery
+        {
+            HasAnyProviderId = new Dictionary<string, string> { ["Tmdb"] = tmdbId.Value.ToString(CultureInfo.InvariantCulture) },
+            IncludeItemTypes = mediaType == "tv" ? [BaseItemKind.Series] : [BaseItemKind.Movie],
+            Recursive = true,
+        };
+
+        return _libraryManager.GetItemList(query).Count > 0;
     }
 
     [HttpPost]
@@ -166,4 +205,17 @@ public sealed class TmdbSearchItem
 
 public sealed class TmdbSearchResult : AddWishlistItemRequest
 {
+}
+
+public sealed class WishlistItemView
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string MediaType { get; set; } = string.Empty;
+    public int? Year { get; set; }
+    public string? Overview { get; set; }
+    public string? PosterUrl { get; set; }
+    public int? TmdbId { get; set; }
+    public DateTimeOffset AddedAt { get; set; }
+    public bool InLibrary { get; set; }
 }

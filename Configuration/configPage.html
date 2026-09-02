@@ -128,6 +128,10 @@
                     background: rgba(0, 164, 220, 0.18);
                     color: #6fd0f5;
                 }
+                #wishlistPluginPage .wishlistBadge-inLibrary {
+                    background: rgba(82, 196, 26, 0.18);
+                    color: #7bdb63;
+                }
                 #wishlistPluginPage .wishlistCardBody .wishlistButton {
                     margin-top: auto;
                     width: 100%;
@@ -210,6 +214,13 @@
             badge.className = 'wishlistBadge';
             badge.appendChild(text(item.MediaType === 'tv' ? 'TV show' : 'Movie'));
             body.appendChild(badge);
+
+            if (item.InLibrary) {
+                var libraryBadge = document.createElement('span');
+                libraryBadge.className = 'wishlistBadge wishlistBadge-inLibrary';
+                libraryBadge.appendChild(text('Already in library'));
+                body.appendChild(libraryBadge);
+            }
 
             var title = document.createElement('div');
             title.className = 'wishlistCardTitle';
