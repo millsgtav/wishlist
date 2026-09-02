@@ -1,29 +1,46 @@
 # Jellyfin Wishlist
 
-A lightweight Jellyfin administration plugin for keeping a shopping list of movies and TV shows to buy. Search TMDb from the dashboard, add an item, and keep its poster, type, year, and overview with the list.
+Wishlist is a Jellyfin administration plugin for keeping a shopping list of movies and TV shows. Search TMDb from the Jellyfin dashboard, save titles with their poster and release year, and remove items after you buy them.
 
-## Configure in Jellyfin
+## Features
 
-1. Build or install the plugin, then restart Jellyfin.
-2. Open **Dashboard > Plugins > Wishlist**.
-3. Enter your TMDb API key in the plugin settings and save it. The key is saved only in Jellyfin's plugin configuration, never in this repository.
-4. Search for a title and add it to the shopping list.
+- Search for movies and TV shows using TMDb.
+- Sort the shopping list A-Z, Z-A, or by date added.
+- Filter the list to all items, movies, or TV shows.
+- Show an "Already in library" badge when Jellyfin finds a matching title.
+- Rescan the library status without reloading the page.
+- Use a compact list layout on mobile devices.
 
-## Build locally
+## Install from the plugin repository
 
-Install the .NET 8 SDK, then run:
+1. In Jellyfin, open **Dashboard > Plugins > Repositories**.
+2. Select **Add** and enter this repository URL:
 
-```powershell
-.\build-plugin.ps1 -Version 1.0.0.0
-```
+	`https://raw.githubusercontent.com/millsgtav/wishlist/main/manifest.json`
 
-Copy the resulting zip to your Jellyfin plugins directory, extract it, and restart the server. For Jellyfin 10.10.x, the plugin targets ABI `10.10.0.0`.
+3. Save the repository, then open the **Catalog** tab.
+4. Find **Wishlist**, select **Install**, and restart Jellyfin when prompted.
+5. Open **Dashboard > Plugins > Wishlist**.
 
-## Publish through GitHub
+The plugin requires Jellyfin 10.11 or later. The plugin API is restricted to Jellyfin users with administrator privileges.
 
-1. Create an empty GitHub repository and push this folder to its default branch.
-2. Create and push a tag such as `v1.0.0.0`.
-3. The included GitHub Actions workflow builds the zip, creates a GitHub release, and updates `manifest.json` with its URL and checksum.
-4. In Jellyfin, add `https://raw.githubusercontent.com/<owner>/<repository>/<default-branch>/manifest.json` as a plugin repository, then install Wishlist from the catalog.
+## Configure TMDb search
 
-The workflow needs repository **Actions: Read and write permissions** so it can commit the updated manifest.
+Search requires a TMDb API key. Create an API key in your [TMDb account settings](https://www.themoviedb.org/settings/api), then:
+
+1. Open **Dashboard > Plugins > Wishlist** in Jellyfin.
+2. Expand **Settings**.
+3. Enter the key and select **Save settings**.
+
+The key is stored in Jellyfin's plugin configuration and is used by the Jellyfin server to call TMDb. It is not included in this repository, the plugin package, or the installation manifest. Do not paste your key into an issue, pull request, or public configuration file.
+
+## Use the shopping list
+
+Search for a title and select **Add to list**. Use the pills above the shopping list to change its sort order or filter by media type. Select **Rescan** after adding a title to your Jellyfin library; the badge is recalculated from the current library contents.
+
+## Security and privacy
+
+- No credentials or personal paths are required in the source code.
+- TMDb searches are sent from the Jellyfin server to TMDb; the plugin does not send requests directly from a user's browser.
+- Wishlist data and the TMDb key are stored in Jellyfin's own plugin configuration.
+- Keep Jellyfin administrator access limited to trusted users, since administrators can access plugin settings and wishlist data.
