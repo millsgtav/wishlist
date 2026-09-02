@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -102,7 +103,9 @@ public sealed class WishlistController : ControllerBase
             return StatusCode((int)response.StatusCode, "TMDb search failed. Check the API key and try again.");
         }
 
-        var payload = await response.Content.ReadFromJsonAsync<TmdbSearchResponse>(cancellationToken: cancellationToken);
+        var payload = await response.Content.ReadFromJsonAsync<TmdbSearchResponse>(
+            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+            cancellationToken);
         var results = payload?.Results
             .Where(result => result.MediaType is "movie" or "tv")
             .Take(10)
@@ -146,10 +149,18 @@ public sealed class TmdbSearchItem
     public int Id { get; set; }
     public string? Title { get; set; }
     public string? Name { get; set; }
+
+    [JsonPropertyName("media_type")]
     public string? MediaType { get; set; }
     public string? Overview { get; set; }
+
+    [JsonPropertyName("poster_path")]
     public string? PosterPath { get; set; }
+
+    [JsonPropertyName("release_date")]
     public string? ReleaseDate { get; set; }
+
+    [JsonPropertyName("first_air_date")]
     public string? FirstAirDate { get; set; }
 }
 
