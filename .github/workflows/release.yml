@@ -50,7 +50,7 @@ jobs:
             changelog = "Release $version"
             targetAbi = '10.10.0.0'
             sourceUrl = "https://github.com/$env:REPOSITORY/releases/download/v$version/$($zip.Name)"
-            checksum = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+            checksum = (Get-FileHash $zip -Algorithm MD5).Hash.ToLowerInvariant()
             timestamp = (Get-Date).ToUniversalTime().ToString('o')
           })
           $manifest | ConvertTo-Json -Depth 5 -AsArray | Set-Content manifest.json
