@@ -29,7 +29,8 @@
 <script>
     (function () {
         var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
-        var page = document.querySelector('#wishlistPluginPage');
+        // Scope to this script's own page instance; querying by id can hit a stale duplicate left from a previous visit to this page.
+        var page = document.currentScript.previousElementSibling || document.querySelector('#wishlistPluginPage');
 
         function request(method, path, data) {
             return ApiClient.ajax({
