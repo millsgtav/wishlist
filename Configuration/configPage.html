@@ -27,10 +27,16 @@
 </div>
 
 <script>
+    console.log('[wishlist] script tag reached');
     (function () {
+        console.log('[wishlist] IIFE running');
         var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
         // Scope to this script's own page instance; querying by id can hit a stale duplicate left from a previous visit to this page.
-        var page = document.currentScript.previousElementSibling || document.querySelector('#wishlistPluginPage');
+        var page = document.currentScript ? document.currentScript.previousElementSibling : null;
+        if (!page) {
+            page = document.querySelector('#wishlistPluginPage');
+        }
+        console.log('[wishlist] page element resolved:', page);
 
         function request(method, path, data) {
             return ApiClient.ajax({
@@ -95,20 +101,25 @@
 
         page.querySelector('#wishlistSettingsForm').addEventListener('submit', function (event) {
             event.preventDefault();
+            console.log('[wishlist] save settings submitted');
             ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                 config.TmdbApiKey = page.querySelector('#tmdbApiKey').value;
                 return ApiClient.updatePluginConfiguration(pluginId, config);
-            }).then(function () { Dashboard.alert('Wishlist settings saved.'); });
+            }).then(function () { console.log('[wishlist] save succeeded'); Dashboard.alert('Wishlist settings saved.'); })
+              .catch(function (err) { console.error('[wishlist] save failed', err); });
         });
 
         page.querySelector('#wishlistSearchForm').addEventListener('submit', function (event) {
             event.preventDefault();
+            console.log('[wishlist] search submitted');
             var target = page.querySelector('#wishlistSearchResults');
             target.innerHTML = '';
             request('GET', 'Wishlist/search?query=' + encodeURIComponent(page.querySelector('#wishlistSearch').value))
-                .then(function (items) { items.forEach(function (item) { makeResult(item, target, true); }); })
-                .catch(function () { Dashboard.alert('TMDb search failed. Save a valid API key, then try again.'); });
+                .then(function (items) { console.log('[wishlist] search results', items); items.forEach(function (item) { makeResult(item, target, true); }); })
+                .catch(function (err) { console.error('[wishlist] search failed', err); Dashboard.alert('TMDb search failed. Save a valid API key, then try again.'); });
         });
+
+        console.log('[wishlist] listeners attached');
 
         page.addEventListener('viewshow', function () {
             ApiClient.getPluginConfiguration(pluginId).then(function (config) {
