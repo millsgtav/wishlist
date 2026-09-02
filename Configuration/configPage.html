@@ -24,18 +24,15 @@
             <div id="wishlistItems"></div>
         </div>
     </div>
-</div>
 
-<script>
+    <!--<script>
     console.log('[wishlist] script tag reached');
     (function () {
         console.log('[wishlist] IIFE running');
         var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
-        // Scope to this script's own page instance; querying by id can hit a stale duplicate left from a previous visit to this page.
-        var page = document.currentScript ? document.currentScript.previousElementSibling : null;
-        if (!page) {
-            page = document.querySelector('#wishlistPluginPage');
-        }
+        // Jellyfin's view cache can hold a stale, already-initialized copy of this page; always pick the fresh one.
+        var page = document.querySelector('#wishlistPluginPage:not([data-wishlist-ready])') || document.querySelector('#wishlistPluginPage');
+        page.setAttribute('data-wishlist-ready', 'true');
         console.log('[wishlist] page element resolved:', page);
 
         function request(method, path, data) {
@@ -128,4 +125,5 @@
             loadItems();
         });
     }());
-</script>
+    </script>-->
+</div>
