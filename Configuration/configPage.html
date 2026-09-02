@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<div id="wishlistPluginPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
+<div id="wishlistPluginPage" data-role="page" class="page type-interior pluginConfigurationPage">
     <div data-role="content">
         <div class="content-primary">
             <form id="wishlistSettingsForm">
                 <div class="inputContainer">
-                    <input id="tmdbApiKey" type="password" is="emby-input" label="TMDb API key" autocomplete="off" />
+                    <label for="tmdbApiKey">TMDb API key</label>
+                    <input id="tmdbApiKey" type="password" autocomplete="off" class="emby-input" style="display:block;width:100%;box-sizing:border-box" />
                     <div class="fieldDescription">Used only to search TMDb from this Jellyfin server.</div>
                 </div>
-                <button is="emby-button" type="submit" class="raised button-submit block">Save settings</button>
+                <button type="submit" class="raised button-submit block">Save settings</button>
             </form>
 
             <form id="wishlistSearchForm">
                 <div class="inputContainer">
-                    <input id="wishlistSearch" is="emby-input" label="Find a movie or TV show" />
+                    <label for="wishlistSearch">Find a movie or TV show</label>
+                    <input id="wishlistSearch" type="text" class="emby-input" style="display:block;width:100%;box-sizing:border-box" />
                 </div>
-                <button is="emby-button" type="submit" class="raised block">Search TMDb</button>
+                <button type="submit" class="raised block">Search TMDb</button>
             </form>
 
             <div id="wishlistSearchResults"></div>
@@ -65,7 +67,7 @@
             row.appendChild(details);
             var button = document.createElement('button');
             button.type = 'button';
-            button.className = 'raised emby-button';
+            button.className = 'raised';
             button.appendChild(text(canAdd ? 'Add' : 'Remove'));
             button.addEventListener('click', function () {
                 if (canAdd) {
