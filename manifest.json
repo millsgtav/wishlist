@@ -8,12 +8,12 @@
     "category": "General",
     "versions": [
       {
-        "version": "1.0.2.0",
-        "sourceUrl": "https://github.com/millsgtav/wishlist/releases/download/v1.0.2.0/jellyfin-wishlist_1.0.2.0.zip",
         "targetAbi": "10.10.0.0",
-        "checksum": "914d25fd3904af62fb51138d3923282c",
-        "changelog": "Release 1.0.2.0",
-        "timestamp": "2026-09-02T00:27:26.0734595Z"
+        "version": "1.0.3.0",
+        "changelog": "Release 1.0.3.0",
+        "checksum": "3b12e8c98b0f57e8b72d9054c04eb44b",
+        "timestamp": "2026-09-02T00:41:29.9199461Z",
+        "sourceUrl": "https://github.com/millsgtav/wishlist/releases/download/v1.0.3.0/jellyfin-wishlist_1.0.3.0.zip"
       }
     ]
   }
