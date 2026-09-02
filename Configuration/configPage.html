@@ -42,6 +42,12 @@
                 data: data ? JSON.stringify(data) : undefined,
                 contentType: 'application/json',
                 dataType: method === 'DELETE' ? undefined : 'json'
+            }).then(function (result) {
+                // Some ApiClient versions ignore dataType and resolve with the raw fetch Response; unwrap it ourselves.
+                if (method !== 'DELETE' && result && typeof result.json === 'function') {
+                    return result.json();
+                }
+                return result;
             });
         }
 
