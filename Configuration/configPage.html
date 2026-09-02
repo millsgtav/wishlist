@@ -2,38 +2,174 @@
 <div id="wishlistPluginPage" data-role="page" class="page type-interior pluginConfigurationPage">
     <div data-role="content">
         <div class="content-primary">
-            <form id="wishlistSettingsForm">
-                <div class="inputContainer">
-                    <label for="tmdbApiKey">TMDb API key</label>
-                    <input id="tmdbApiKey" type="password" autocomplete="off" class="emby-input" style="display:block;width:100%;box-sizing:border-box" />
-                    <div class="fieldDescription">Used only to search TMDb from this Jellyfin server.</div>
+            <style>
+                #wishlistPluginPage .wishlistSettings {
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 0.5em;
+                    margin-bottom: 1.5em;
+                    overflow: hidden;
+                }
+                #wishlistPluginPage .wishlistSettings summary {
+                    cursor: pointer;
+                    padding: 0.9em 1.1em;
+                    font-weight: 600;
+                    list-style: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                #wishlistPluginPage .wishlistSettings summary::-webkit-details-marker {
+                    display: none;
+                }
+                #wishlistPluginPage .wishlistSettings summary::after {
+                    content: '\25BE';
+                    transition: transform 0.15s ease;
+                    opacity: 0.7;
+                }
+                #wishlistPluginPage .wishlistSettings[open] summary::after {
+                    transform: rotate(180deg);
+                }
+                #wishlistPluginPage .wishlistSettingsBody {
+                    padding: 0 1.1em 1.1em;
+                }
+                #wishlistPluginPage .wishlistInput {
+                    display: block;
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 0.6em 0.8em;
+                    border-radius: 0.4em;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    background: rgba(255, 255, 255, 0.04);
+                    color: inherit;
+                    font-size: 1em;
+                }
+                #wishlistPluginPage .wishlistInput:focus {
+                    outline: none;
+                    border-color: #00a4dc;
+                    box-shadow: 0 0 0 2px rgba(0, 164, 220, 0.25);
+                }
+                #wishlistPluginPage .wishlistButton {
+                    border: none;
+                    border-radius: 0.4em;
+                    padding: 0.55em 1.2em;
+                    font-weight: 600;
+                    cursor: pointer;
+                    background: #00a4dc;
+                    color: #fff;
+                    transition: background 0.15s ease, transform 0.05s ease;
+                }
+                #wishlistPluginPage .wishlistButton:hover {
+                    background: #0088b8;
+                }
+                #wishlistPluginPage .wishlistButton:active {
+                    transform: scale(0.98);
+                }
+                #wishlistPluginPage .wishlistButton.secondary {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+                #wishlistPluginPage .wishlistButton.secondary:hover {
+                    background: rgba(255, 255, 255, 0.18);
+                }
+                #wishlistPluginPage .wishlistSearchBar {
+                    display: flex;
+                    gap: 0.6em;
+                    margin-bottom: 1.5em;
+                }
+                #wishlistPluginPage .wishlistSearchBar .wishlistInput {
+                    flex: 1;
+                }
+                #wishlistPluginPage h2 {
+                    font-size: 1.15em;
+                    margin: 1.6em 0 0.7em;
+                }
+                #wishlistPluginPage .wishlistGrid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 1em;
+                }
+                #wishlistPluginPage .wishlistCard {
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 0.6em;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    transition: transform 0.15s ease, border-color 0.15s ease;
+                }
+                #wishlistPluginPage .wishlistCard:hover {
+                    transform: translateY(-2px);
+                    border-color: rgba(255, 255, 255, 0.2);
+                }
+                #wishlistPluginPage .wishlistCardPoster {
+                    width: 100%;
+                    aspect-ratio: 2 / 3;
+                    object-fit: cover;
+                    background: rgba(255, 255, 255, 0.06);
+                }
+                #wishlistPluginPage .wishlistCardBody {
+                    padding: 0.7em 0.8em;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.35em;
+                    flex: 1;
+                }
+                #wishlistPluginPage .wishlistCardTitle {
+                    font-weight: 600;
+                    font-size: 0.95em;
+                    line-height: 1.25;
+                }
+                #wishlistPluginPage .wishlistBadge {
+                    align-self: flex-start;
+                    font-size: 0.72em;
+                    text-transform: uppercase;
+                    letter-spacing: 0.03em;
+                    padding: 0.15em 0.5em;
+                    border-radius: 1em;
+                    background: rgba(0, 164, 220, 0.18);
+                    color: #6fd0f5;
+                }
+                #wishlistPluginPage .wishlistCardBody .wishlistButton {
+                    margin-top: auto;
+                    width: 100%;
+                }
+                #wishlistPluginPage .wishlistEmpty {
+                    opacity: 0.7;
+                    padding: 0.5em 0;
+                }
+            </style>
+
+            <details class="wishlistSettings">
+                <summary>Settings</summary>
+                <div class="wishlistSettingsBody">
+                    <form id="wishlistSettingsForm">
+                        <div class="inputContainer">
+                            <label for="tmdbApiKey">TMDb API key</label>
+                            <input id="tmdbApiKey" type="password" autocomplete="off" class="wishlistInput" />
+                            <div class="fieldDescription">Used only to search TMDb from this Jellyfin server.</div>
+                        </div>
+                        <button type="submit" class="wishlistButton">Save settings</button>
+                    </form>
                 </div>
-                <button type="submit" class="raised button-submit block">Save settings</button>
+            </details>
+
+            <form id="wishlistSearchForm" class="wishlistSearchBar">
+                <input id="wishlistSearch" type="text" class="wishlistInput" placeholder="Find a movie or TV show" />
+                <button type="submit" class="wishlistButton">Search</button>
             </form>
 
-            <form id="wishlistSearchForm">
-                <div class="inputContainer">
-                    <label for="wishlistSearch">Find a movie or TV show</label>
-                    <input id="wishlistSearch" type="text" class="emby-input" style="display:block;width:100%;box-sizing:border-box" />
-                </div>
-                <button type="submit" class="raised block">Search TMDb</button>
-            </form>
+            <div id="wishlistSearchResults" class="wishlistGrid"></div>
 
-            <div id="wishlistSearchResults"></div>
             <h2>Shopping list</h2>
-            <div id="wishlistItems"></div>
+            <div id="wishlistItems" class="wishlistGrid"></div>
         </div>
     </div>
 
     <!--<script>
-    console.log('[wishlist] script tag reached');
     (function () {
-        console.log('[wishlist] IIFE running');
         var pluginId = '611ce32a-d57d-4573-a7ec-bf4748b708f9';
         // Jellyfin's view cache can hold a stale, already-initialized copy of this page; always pick the fresh one.
         var page = document.querySelector('#wishlistPluginPage:not([data-wishlist-ready])') || document.querySelector('#wishlistPluginPage');
         page.setAttribute('data-wishlist-ready', 'true');
-        console.log('[wishlist] page element resolved:', page);
 
         function request(method, path, data) {
             return ApiClient.ajax({
@@ -55,31 +191,35 @@
             return document.createTextNode(value || '');
         }
 
-        function makeResult(item, target, canAdd) {
-            var row = document.createElement('div');
-            row.className = 'listItem';
+        function makeCard(item, target, canAdd) {
+            var card = document.createElement('div');
+            card.className = 'wishlistCard';
+
             if (item.PosterUrl) {
                 var image = document.createElement('img');
+                image.className = 'wishlistCardPoster';
                 image.src = item.PosterUrl;
                 image.alt = '';
-                image.style.cssText = 'width:52px;height:78px;object-fit:cover;margin-right:1em';
-                row.appendChild(image);
+                card.appendChild(image);
             }
-            var details = document.createElement('div');
-            details.className = 'listItemBody';
+
+            var body = document.createElement('div');
+            body.className = 'wishlistCardBody';
+
+            var badge = document.createElement('span');
+            badge.className = 'wishlistBadge';
+            badge.appendChild(text(item.MediaType === 'tv' ? 'TV show' : 'Movie'));
+            body.appendChild(badge);
+
             var title = document.createElement('div');
-            title.className = 'listItemBodyText';
+            title.className = 'wishlistCardTitle';
             title.appendChild(text(item.Title + (item.Year ? ' (' + item.Year + ')' : '')));
-            details.appendChild(title);
-            var type = document.createElement('div');
-            type.className = 'fieldDescription';
-            type.appendChild(text(item.MediaType === 'tv' ? 'TV show' : 'Movie'));
-            details.appendChild(type);
-            row.appendChild(details);
+            body.appendChild(title);
+
             var button = document.createElement('button');
             button.type = 'button';
-            button.className = 'raised';
-            button.appendChild(text(canAdd ? 'Add' : 'Remove'));
+            button.className = 'wishlistButton' + (canAdd ? '' : ' secondary');
+            button.appendChild(text(canAdd ? 'Add to list' : 'Remove'));
             button.addEventListener('click', function () {
                 if (canAdd) {
                     request('POST', 'Wishlist', item).then(function () { loadItems(); target.innerHTML = ''; });
@@ -87,8 +227,10 @@
                     request('DELETE', 'Wishlist/' + item.Id).then(loadItems);
                 }
             });
-            row.appendChild(button);
-            target.appendChild(row);
+            body.appendChild(button);
+
+            card.appendChild(body);
+            target.appendChild(card);
         }
 
         function loadItems() {
@@ -96,34 +238,33 @@
             target.innerHTML = '';
             request('GET', 'Wishlist').then(function (items) {
                 if (!items.length) {
-                    target.appendChild(text('Your shopping list is empty.'));
+                    var empty = document.createElement('div');
+                    empty.className = 'wishlistEmpty';
+                    empty.appendChild(text('Your shopping list is empty.'));
+                    target.appendChild(empty);
                     return;
                 }
-                items.forEach(function (item) { makeResult(item, target, false); });
+                items.forEach(function (item) { makeCard(item, target, false); });
             });
         }
 
         page.querySelector('#wishlistSettingsForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            console.log('[wishlist] save settings submitted');
             ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                 config.TmdbApiKey = page.querySelector('#tmdbApiKey').value;
                 return ApiClient.updatePluginConfiguration(pluginId, config);
-            }).then(function () { console.log('[wishlist] save succeeded'); Dashboard.alert('Wishlist settings saved.'); })
+            }).then(function () { Dashboard.alert('Wishlist settings saved.'); })
               .catch(function (err) { console.error('[wishlist] save failed', err); });
         });
 
         page.querySelector('#wishlistSearchForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            console.log('[wishlist] search submitted');
             var target = page.querySelector('#wishlistSearchResults');
             target.innerHTML = '';
             request('GET', 'Wishlist/search?query=' + encodeURIComponent(page.querySelector('#wishlistSearch').value))
-                .then(function (items) { console.log('[wishlist] search results', items); items.forEach(function (item) { makeResult(item, target, true); }); })
+                .then(function (items) { items.forEach(function (item) { makeCard(item, target, true); }); })
                 .catch(function (err) { console.error('[wishlist] search failed', err); Dashboard.alert('TMDb search failed. Save a valid API key, then try again.'); });
         });
-
-        console.log('[wishlist] listeners attached');
 
         page.addEventListener('viewshow', function () {
             ApiClient.getPluginConfiguration(pluginId).then(function (config) {
